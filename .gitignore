@@ -1,0 +1,14 @@
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# generated data and trained models
+data/*.npz
+models/*.pt
+
+# editor
+.idea/
+.vscode/
