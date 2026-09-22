@@ -46,3 +46,11 @@ def test_nan_above_spot():
 
 def test_nan_not_exception_on_garbage():
     assert np.isnan(implied_vol(-5.0, S0, 100, 1.0, R))
+
+
+def test_nan_at_exact_bounds():
+    # a price sitting exactly on intrinsic has no vol to recover; letting it
+    # through sends the solver to its lower bracket and labels it as 0.01% vol
+    K, T = 80, 0.1
+    assert np.isnan(implied_vol(S0 - K * np.exp(-R * T), S0, K, T, R))
+    assert np.isnan(implied_vol(0.0, S0, 130, T, R))

@@ -12,3 +12,7 @@ models/*.pt
 # editor
 .idea/
 .vscode/
+
+# mlflow
+mlruns/
+mlartifacts/

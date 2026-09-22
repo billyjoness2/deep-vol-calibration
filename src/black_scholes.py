@@ -18,7 +18,7 @@ def bs_call_price(S0: float, K: float, T: float, r: float, sigma: float) -> floa
     if T <= 0 or sigma <= 0:
         return max(S0 - K, 0.0)
 
-    d1 = (np.log(S0 / K) + r + ((sigma ** 2) / 2) * T) / (sigma * np.sqrt(T))
+    d1 = (np.log(S0 / K) + (r + sigma ** 2 / 2) * T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma * np.sqrt(T)
 
     return S0 * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
@@ -39,16 +39,22 @@ def implied_vol(price: float, S0: float, K: float, T: float, r: float,
     Returns: implied volatility (annualized)
     """
 
-    if price < max(S0 - K * np.exp(-r * T), 0.0) or price > S0:
+    if price <= max(S0 - K * np.exp(-r * T), 0.0) or price >= S0:
         return np.nan
 
     def f(sigma):
         return bs_call_price(S0, K, T, r, sigma) - price
 
     try:
-        return brentq(f, lo, hi, xtol=1e-8, maxiter=200     )
+        sigma = brentq(f, lo, hi, xtol=1e-8, maxiter=200)
     except ValueError:
         return np.nan
+
+    # a root on either bracket end means the price carried no vol information,
+    # usually an underflowed deep OTM price rather than a genuine 0.01% vol
+    if sigma <= lo * 1.01 or sigma >= hi * 0.99:
+        return np.nan
+    return sigma
 
 
 if __name__ == "__main__":
