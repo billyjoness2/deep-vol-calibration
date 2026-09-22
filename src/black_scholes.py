@@ -16,7 +16,7 @@ def bs_call_price(S0: float, K: float, T: float, r: float, sigma: float) -> floa
     if T <= 0 or sigma <= 0:
         return max(S0 - K, 0.0)
 
-    d1 = (np.log(S0 / K) + r + ((sigma ** 2) / 2) * T) / (sigma * np.sqrt(T))
+    d1 = (np.log(S0 / K) + (r + sigma ** 2 / 2) * T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma * np.sqrt(T)
 
     return S0 * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
