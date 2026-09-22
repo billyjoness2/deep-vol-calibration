@@ -5,18 +5,20 @@ from scipy.optimize import brentq
 
 def bs_call_price(S0: float, K: float, T: float, r: float, sigma: float) -> float:
     """
-       Black-Scholes European call price:
-       S0: spot price
-       K: strike price
-       T: time to expiration (years)
-       r: annualized risk-free interest rate
-       sigma: annualized volatility of the stocks returns
+    Black-Scholes European call price:
+    S0: spot price
+    K: strike price
+    T: time to expiration (years)
+    r: annualized risk-free interest rate
+    sigma: annualized volatility of the stocks returns
+
+    Returns: call price
     """
 
     if T <= 0 or sigma <= 0:
         return max(S0 - K, 0.0)
 
-    d1 = (np.log(S0 / K) + (r + sigma ** 2 / 2) * T) / (sigma * np.sqrt(T))
+    d1 = (np.log(S0 / K) + r + ((sigma ** 2) / 2) * T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma * np.sqrt(T)
 
     return S0 * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
@@ -24,16 +26,27 @@ def bs_call_price(S0: float, K: float, T: float, r: float, sigma: float) -> floa
 
 def implied_vol(price: float, S0: float, K: float, T: float, r: float,
                  lo: float = 1e-4, hi: float = 5.0) -> float:
-    '''
+    """
     Solve Black-Scholes for IV.
-    price:
-    '''
+    price: observed option price
+    S0: spot price
+    K: strike price
+    T: time to expiration (years)
+    r: annualized risk-free interest rate
+    lo: lower bound for volatility search
+    hi: upper bound for volatility search
+
+    Returns: implied volatility (annualized)
+    """
+
+    if price < max(S0 - K * np.exp(-r * T), 0.0) or price > S0:
+        return np.nan
 
     def f(sigma):
         return bs_call_price(S0, K, T, r, sigma) - price
 
     try:
-        return brentq(f, lo, hi, xtol=1e-8, maxiter=200)
+        return brentq(f, lo, hi, xtol=1e-8, maxiter=200     )
     except ValueError:
         return np.nan
 
