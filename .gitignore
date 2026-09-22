@@ -16,3 +16,4 @@ models/*.pt
 # mlflow
 mlruns/
 mlartifacts/
+mlflow.db
