@@ -16,17 +16,21 @@ def sample_params(n: int, seed: int, param_ranges: dict = PARAM_RANGES) -> pd.Da
     params = {name: rng.uniform(low, high, size=n) for name, (low, high) in param_ranges.items()}
     return pd.DataFrame(params)
 
+def surface_for_params(kappa, theta, xi, rho, v0) -> np.ndarray:
+    '''Return the implied-vol surface for the standard money/time grid.'''
+    return np.array([
+        heston_implied_vol(S0, m * S0, t, R, kappa, theta, xi, rho, v0)
+        for m, t in POINTS
+    ], dtype=float)
 
 def build_dataset(params: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     '''Price the implied vol surface for each parameter set. Rows where any grid
     point falls outside arbitrage-free bounds are dropped rather than filled.'''
-    surfaces = []
-    for _, row in params.iterrows():
-        kappa, theta, xi, rho, v0 = row[HESTON_PARAM_NAMES]
-        surfaces.append([heston_implied_vol(S0, m * S0, t, R, kappa, theta, xi, rho, v0)
-                         for m, t in POINTS])
 
-    surfaces = pd.DataFrame(surfaces, columns=COLUMNS)
+    surfaces = pd.DataFrame(
+        [surface_for_params(*row[HESTON_PARAM_NAMES]) for _, row in params.iterrows()],
+        columns=COLUMNS,
+    )
     keep = surfaces.notna().all(axis=1)
     dropped = (~keep).sum()
     if dropped:
