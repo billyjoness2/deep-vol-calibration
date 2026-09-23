@@ -7,6 +7,7 @@ __pycache__/
 
 # generated data and trained models
 data/*.npz
+data/*.npy
 models/*.pt
 
 # editor
