@@ -1,0 +1,8 @@
+{
+ "trials": 10,
+ "classical_time_s": 54.80153227999981,
+ "surrogate_time_s": 0.8909827299998142,
+ "speedup": 61.50684007086337,
+ "classical_err_pct": 7.885562091282265,
+ "surrogate_err_pct": 4.320740282253114
+}
