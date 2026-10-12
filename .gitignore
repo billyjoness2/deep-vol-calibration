@@ -18,3 +18,8 @@ models/*.pt
 mlruns/
 mlartifacts/
 mlflow.db
+venv/
+venv311/
+env/
+*.py[cod]
+.mypy_cache/
